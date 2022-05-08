@@ -33,7 +33,7 @@ neural_link *link_neural_layers(neural_layer *source, neural_layer *target) {
 		free(target->prev);
 
 	// allocate and initialize the link
-	const unsigned weight_count = source->size * target->size;
+	const unsigned weight_count = count_weights(source, target);
 	neural_link *const link = malloc(sizeof(*link) + weight_count * sizeof(double));
 	if (!link) return NULL;
 	*link = (neural_link) { .source = source, .target = target };
@@ -69,6 +69,9 @@ void feed_forward(const neural_link *link, double *input, double *output) {
 			const double activation = sigmoid(input[i] * weight);
 			sum += activation;
 		}
+
+		// plus bias
+		sum += *get_weight((neural_link *) link, source->size, j);
 
 		output[j] = sum;
 	}
